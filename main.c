@@ -1,6 +1,7 @@
 #include "utils.h"
 #include "circle.h"
 #include "rect.h"
+#include "vec2.h"
 #include "window.h"
 
 #define FPS 60
@@ -37,18 +38,6 @@ World world;
 
 Circle *p_circle = NULL;
 Rect *p_rect = NULL;
-
-void vec2f_norm(double vec[2], double uvec[2])
-{
-    double size = sqrt(vec[0] * vec[0] + vec[1] * vec[1]);
-    uvec[0] = vec[0] / size;
-    uvec[1] = vec[1] / size;
-}
-
-double vec2f_size(double vec[2])
-{
-    return sqrt(vec[0] * vec[0] + vec[1] * vec[1]);
-}
 
 /* Returns the file dimensions (rows, cols) of fp */
 void fsize(FILE *fp, int *nx, int *ny)
@@ -339,12 +328,12 @@ int collide_circle_rect(Circle *circle, Rect *rect)
     rect->minpoint(rect, circle->cx, circle->cy, &nx, &ny);
 
     double vec[2] = { nx - circle->cx, ny - circle->cy };
-    double overlap = circle->size - vec2f_size(vec);
+    double overlap = circle->size - vec2_size(vec);
 
     if (overlap > 0.0)
     {
         double uvec[2] = { 0.0, 0.0 };
-        vec2f_norm(vec, uvec);
+        vec2_norm(vec, uvec);
         circle->cx -= uvec[0] * overlap;
         circle->cy -= uvec[1] * overlap;
         return 1;
