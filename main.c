@@ -397,7 +397,7 @@ void world_draw(void)
     }
 }
 
-void draw_ray_circle(Circle *circle, Rect *rect)
+void draw_circle_ray(Circle *circle, Rect *rect)
 {
     double nx, ny;
     rect->minpoint(rect, circle->cx, circle->cy, &nx, &ny);
@@ -409,7 +409,7 @@ void draw_ray_circle(Circle *circle, Rect *rect)
     glEnd();
 }
 
-void draw_ray_rect(Rect *r1, Rect *r2)
+void draw_rect_ray(Rect *r1, Rect *r2)
 {
     double size = r1->size;
     double x = r1->cx + size / 2;
@@ -424,19 +424,18 @@ void draw_ray_rect(Rect *r1, Rect *r2)
     glEnd();
 }
 
-void draw_ray_rect_normal(Rect *r1, Rect *r2)
+void draw_rect_normal(Rect *r1, Rect *r2)
 {
     double s1 = r1->size;
-    double s2 = r2->size;
     double x1 = r1->cx;
     double y1 = r1->cy;
-    double x2 = r2->cx;
-    double y2 = r2->cy;
-    double nx, ny;
 
     double cx1 = x1 + s1 / 2;
     double cy1 = y1 + s1 / 2;
+
+    double nx, ny;
     r2->minpoint(r2, cx1, cy1, &nx, &ny);
+
     double vec[2] = { nx - cx1, ny - cy1 };
 
     glColor4f(1.0, 0.0, 0.0, 1.0);
@@ -445,43 +444,77 @@ void draw_ray_rect_normal(Rect *r1, Rect *r2)
 
     if (fabs(vec[0]) > fabs(vec[1]))
     {
-        // Approaching r2 right
         if (vec[0] < 0)
         {
-            if (x1 < (x2 + s2))
-                r1->cx += (x2 + s2) - x1;
             glVertex2f(nx, ny);
             glVertex2f(nx + world.cell_size, ny);
         }
-        // Approaching r2 left
         else
         {
-            if ((x1 + s1) > x2)
-                r1->cx -= (x1 + s1) - x2;
             glVertex2f(nx, ny);
             glVertex2f(nx - world.cell_size, ny);
         }
     }
     else if (fabs(vec[1]) > fabs(vec[0]))
     {
-        // Approaching r2 bottom
         if (vec[1] > 0)
         {
-            if ((y1 + s1) > y2)
-                r1->cy -= (y1 + s1) - y2;
             glVertex2f(nx, ny);
             glVertex2f(nx, ny - world.cell_size);
         }
-        // Approaching r2 top
         else
         {
-            if (y1 < (y2 + s2))
-                r1->cy += (y2 + s2) - y1;
             glVertex2f(nx, ny);
             glVertex2f(nx, ny + world.cell_size);
         }
     }
+
     glEnd();
+}
+
+void collide_rect_rect(Rect *r1, Rect *r2)
+{
+    double s1 = r1->size;
+    double s2 = r2->size;
+    double x1 = r1->cx;
+    double y1 = r1->cy;
+    double x2 = r2->cx;
+    double y2 = r2->cy;
+
+    double cx1 = x1 + s1 / 2;
+    double cy1 = y1 + s1 / 2;
+
+    double nx, ny;
+    r2->minpoint(r2, cx1, cy1, &nx, &ny);
+
+    double vec[2] = { nx - cx1, ny - cy1 };
+
+    if (fabs(vec[0]) > fabs(vec[1]))
+    {
+        if (vec[0] < 0)
+        {
+            if (x1 < (x2 + s2))
+                r1->cx += (x2 + s2) - x1;
+        }
+        else
+        {
+            if ((x1 + s1) > x2)
+                r1->cx -= (x1 + s1) - x2;
+        }
+    }
+    else if (fabs(vec[1]) > fabs(vec[0]))
+    {
+        if (vec[1] > 0)
+        {
+            if ((y1 + s1) > y2)
+                r1->cy -= (y1 + s1) - y2;
+        }
+        else
+        {
+            if (y1 < (y2 + s2))
+                r1->cy += (y2 + s2) - y1;
+        }
+    }
 }
 
 void draw_circle(double x, double y, double size)
@@ -501,7 +534,7 @@ void draw_circle(double x, double y, double size)
     glEnd();
 }
 
-int collision_circle_rect(Circle *circle, Rect *rect)
+int collide_circle_rect(Circle *circle, Rect *rect)
 {
     double nx, ny;
     rect->minpoint(rect, circle->cx, circle->cy, &nx, &ny);
@@ -536,8 +569,8 @@ void world_resolve_circle_collision(void)
             Rect *rect = world.cells[i];
             if (rect != NULL)
             {
-                collision_circle_rect(p_circle, rect);
-                draw_ray_circle(p_circle, rect);
+                collide_circle_rect(p_circle, rect);
+                draw_circle_ray(p_circle, rect);
             }
         }
     }
@@ -563,8 +596,9 @@ void world_resolve_rect_collision(void)
         Rect *rect = cell(x, y + dy);
         if (rect != NULL)
         {
-            draw_ray_rect(p_rect, rect);
-            draw_ray_rect_normal(p_rect, rect);
+            draw_rect_ray(p_rect, rect);
+            draw_rect_normal(p_rect, rect);
+            collide_rect_rect(p_rect, rect);
         }
     }
 
@@ -574,8 +608,9 @@ void world_resolve_rect_collision(void)
         Rect *rect = cell(x - 1, y + dy);
         if (rect != NULL)
         {
-            draw_ray_rect(p_rect, rect);
-            draw_ray_rect_normal(p_rect, rect);
+            draw_rect_ray(p_rect, rect);
+            draw_rect_normal(p_rect, rect);
+            collide_rect_rect(p_rect, rect);
         }
     }
 
@@ -585,8 +620,9 @@ void world_resolve_rect_collision(void)
         Rect *rect = cell(x + 1, y + dy);
         if (rect != NULL)
         {
-            draw_ray_rect(p_rect, rect);
-            draw_ray_rect_normal(p_rect, rect);
+            draw_rect_ray(p_rect, rect);
+            draw_rect_normal(p_rect, rect);
+            collide_rect_rect(p_rect, rect);
         }
     }
 }
