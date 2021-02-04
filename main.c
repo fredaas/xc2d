@@ -424,14 +424,14 @@ void init_circle(void)
 void update_circle(void)
 {
     if (is_key_down(GLFW_KEY_J))
-        p_circle->turn_left(p_circle);
+        circle_turn_left(p_circle);
     if (is_key_down(GLFW_KEY_L))
-        p_circle->turn_right(p_circle);
+        circle_turn_right(p_circle);
     if (is_key_down(GLFW_KEY_I))
-        p_circle->move_forward(p_circle);
+        circle_move_forward(p_circle);
     if (is_key_down(GLFW_KEY_K))
-        p_circle->move_backward(p_circle);
-    p_circle->draw(p_circle);
+        circle_move_backward(p_circle);
+    circle_draw(p_circle);
 }
 
 void init_rect(void)

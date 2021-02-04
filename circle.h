@@ -12,14 +12,14 @@ struct Circle {
     double size; /* Radius */
     double *points;
     int H; /* Number of (x, y) points */
-
-    void (*draw)(Circle *self);
-    void (*turn_left)(Circle *self);
-    void (*turn_right)(Circle *self);
-    void (*move_forward)(Circle *self);
-    void (*move_backward)(Circle *self);
 };
 
 Circle *new_circle(double cx, double cy, double size);
+void circle_create_shape(Circle *self);
+void circle_draw(Circle *self);
+void circle_turn_left(Circle *self);
+void circle_turn_right(Circle *self);
+void circle_move_forward(Circle *self);
+void circle_move_backward(Circle *self);
 
 #endif /* CIRCLE_H */

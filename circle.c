@@ -1,12 +1,5 @@
 #include "circle.h"
 
-static void create_shape(Circle *self);
-static void draw(Circle *self);
-static void turn_left(Circle *self);
-static void turn_right(Circle *self);
-static void move_forward(Circle *self);
-static void move_backward(Circle *self);
-
 Circle *new_circle(double cx, double cy, double size)
 {
     Circle *self = (Circle *)malloc(sizeof(Circle));
@@ -16,18 +9,12 @@ Circle *new_circle(double cx, double cy, double size)
     self->size = size;
     self->H = 15;
 
-    create_shape(self);
-
-    self->draw = draw;
-    self->turn_left = turn_left;
-    self->turn_right = turn_right;
-    self->move_forward = move_forward;
-    self->move_backward = move_backward;
+    circle_create_shape(self);
 
     return self;
 }
 
-static void create_shape(Circle *self)
+void circle_create_shape(Circle *self)
 {
     double delta = 2 * PI / self->H;
     double rad = 0.0;
@@ -42,7 +29,7 @@ static void create_shape(Circle *self)
     }
 }
 
-static void draw(Circle *self)
+void circle_draw(Circle *self)
 {
     glColor4f(1.0, 1.0, 1.0, 1.0);
 
@@ -71,7 +58,7 @@ static void draw(Circle *self)
     glEnd();
 }
 
-static void rotate(Circle *self, double delta)
+void circle_rotate(Circle *self, double delta)
 {
     for (int i = 0; i < self->H; i++)
     {
@@ -89,23 +76,23 @@ static void rotate(Circle *self, double delta)
         self->r += 2 * PI;
 }
 
-static void turn_left(Circle *self)
+void circle_turn_left(Circle *self)
 {
-    rotate(self, 0.001);
+    circle_rotate(self, 0.001);
 }
 
-static void turn_right(Circle *self)
+void circle_turn_right(Circle *self)
 {
-    rotate(self, -0.001);
+    circle_rotate(self, -0.001);
 }
 
-static void move_forward(Circle *self)
+void circle_move_forward(Circle *self)
 {
     self->cx += cos(self->r) * 0.1;
     self->cy += sin(self->r) * 0.1;
 }
 
-static void move_backward(Circle *self)
+void circle_move_backward(Circle *self)
 {
     self->cx -= cos(self->r) * 0.1;
     self->cy -= sin(self->r) * 0.1;
