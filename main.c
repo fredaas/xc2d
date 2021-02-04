@@ -39,6 +39,19 @@ World world;
 Circle *p_circle = NULL;
 Rect *p_rect = NULL;
 
+/* Extracts 'k' bits from 'n' starting at position 'p' */
+#define biso(n, k, p) (((1 << (k)) - 1) & (n) >> (p))
+
+void set_drawcolor(int hex)
+{
+    glColor4f(
+        biso(hex, 8, 24) / 256.0,
+        biso(hex, 8, 16) / 256.0,
+        biso(hex, 8, 8) / 256.0,
+        biso(hex, 8, 0) / 256.0
+    );
+}
+
 /* Returns the file dimensions (rows, cols) of fp */
 void fsize(FILE *fp, int *nx, int *ny)
 {
@@ -130,7 +143,7 @@ void world_init(char *path)
     }
 }
 
-void draw_square(double x, double y)
+void draw_square(double x, double y, int hex)
 {
     double size = world.cell_size;
     double points[8] = {
@@ -139,7 +152,7 @@ void draw_square(double x, double y)
         x + size, y + size,
         x + size, y
     };
-    glColor4f(0.0, 0.0, 0.5, 1.0);
+    set_drawcolor(hex);
     glLineWidth(1.0f);
     glBegin(GL_LINES);
     for (int i = 0; i < 4; i++)
@@ -161,7 +174,7 @@ void world_draw_region_circle(void)
     double y = floor(p_circle->cy / cell_size) * cell_size;
     for (int dy = -1; dy <= 1; dy++)
         for (int dx = -1; dx <= 1; dx++)
-            draw_square(x + dx * cell_size, y + dy * cell_size);
+            draw_square(x + dx * cell_size, y + dy * cell_size, 0xff0000ff);
 }
 
 void world_draw_region_rect(void)
@@ -173,7 +186,7 @@ void world_draw_region_rect(void)
     y = floor(y / cell_size) * cell_size;
     for (int dy = -1; dy <= 1; dy++)
         for (int dx = -1; dx <= 1; dx++)
-            draw_square(x + dx * cell_size, y + dy * cell_size);
+            draw_square(x + dx * cell_size, y + dy * cell_size, 0x00ff00ff);
 }
 
 void world_draw(void)
