@@ -42,19 +42,19 @@ static void create_shape(Rect *self)
 
 static void move_left(Rect *self)
 {
-    self->cx -= 0.5;
+    self->cx -= 0.1;
 }
 static void move_right(Rect *self)
 {
-    self->cx += 0.5;
+    self->cx += 0.1;
 }
 static void move_forward(Rect *self)
 {
-    self->cy += 0.5;
+    self->cy += 0.1;
 }
 static void move_backward(Rect *self)
 {
-    self->cy -= 0.5;
+    self->cy -= 0.1;
 }
 
 static void minpoint(Rect *self, double x, double y, double *nx, double *ny)

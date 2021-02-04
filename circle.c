@@ -101,12 +101,12 @@ static void turn_right(Circle *self)
 
 static void move_forward(Circle *self)
 {
-    self->cx += cos(self->r) * 0.05;
-    self->cy += sin(self->r) * 0.05;
+    self->cx += cos(self->r) * 0.1;
+    self->cy += sin(self->r) * 0.1;
 }
 
 static void move_backward(Circle *self)
 {
-    self->cx -= cos(self->r) * 0.05;
-    self->cy -= sin(self->r) * 0.05;
+    self->cx -= cos(self->r) * 0.1;
+    self->cy -= sin(self->r) * 0.1;
 }
