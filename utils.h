@@ -27,9 +27,4 @@
 #define msec(sec) (double)((sec) * 1.0e+3)
 #define usec(sec) (double)((sec) * 1.0e+6)
 
-extern int window_w;
-extern int window_h;
-extern int world_w;
-extern int world_h;
-
 #endif /* UTILS_H */
