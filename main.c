@@ -1,32 +1,19 @@
 #include "utils.h"
 #include "circle.h"
 #include "rect.h"
+#include "window.h"
 
 #define FPS 60
 #define UPDATE_RATE 1000 / (float)FPS
 
 int num_spaceships = 32;
 
-enum {
-    MOUSE_LEFT,
-    MOUSE_RIGHT
-};
-
-int mouse_down[2];
-int mouse_released[2];
-int mouse_pressed[2];
-
-float mx = 0.0,
-      my = 0.0;
-
-int window_w = 1500,
-    window_h = 1000,
-    world_w  = 1500,
-    world_h  = 1500;
-
-GLFWwindow* window;
+int world_w  = 1500;
+int world_h  = 1500;
 
 Rect **rects = NULL;
+
+Window *window = NULL;
 
 int n_rects = 0;
 
@@ -50,194 +37,6 @@ World world;
 
 Circle *p_circle = NULL;
 Rect *p_rect = NULL;
-
-
-/*******************************************************************************
- *
- * I/O
- *
- ******************************************************************************/
-
-int key_down[26];
-
-int key_pressed[26];
-
-void set_key_down(int key, int b)
-{
-    if (key < 65 || key > 90) return;
-    key_down[key - 65] = b;
-}
-
-void set_key_pressed(int key)
-{
-    if (key < 65 || key > 90) return;
-    key_pressed[key - 65] = 1;
-}
-
-int is_key_down(int key)
-{
-    return key_down[key - 65];
-}
-
-int is_key_pressed(int key)
-{
-    int i = key - 65;
-    int b = key_down[i];
-    key_down[i] = 0;
-    return b;
-}
-
-static void key_callback(GLFWwindow* window, int key, int scancode, int action,
-    int mods)
-{
-    if (action == GLFW_PRESS)
-    {
-        set_key_down(key, 1);
-        set_key_pressed(key);
-    }
-    if (action == GLFW_RELEASE)
-    {
-        set_key_down(key, 0);
-    }
-}
-
-static void cursor_position_callback(GLFWwindow *window, double x, double y)
-{
-    mx = x;
-    my = window_h - y;
-}
-
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-{
-    if (action == GLFW_PRESS)
-    {
-        if (button == GLFW_MOUSE_BUTTON_RIGHT)
-            mouse_down[MOUSE_RIGHT] = 1;
-        if (button == GLFW_MOUSE_BUTTON_LEFT)
-            mouse_pressed[MOUSE_LEFT] = 1;
-    }
-    if (action == GLFW_RELEASE)
-    {
-        if (button == GLFW_MOUSE_BUTTON_RIGHT)
-            mouse_down[MOUSE_RIGHT] = 0;
-        if (button == GLFW_MOUSE_BUTTON_LEFT)
-            mouse_released[MOUSE_LEFT] = 1;
-    }
-}
-
-/* Returns 1 once when 'key' is pressed, 0 otherwise */
-int is_mouse_pressed(int key)
-{
-    int key_state = 0;
-    switch (key)
-    {
-    case MOUSE_LEFT:
-        key_state = mouse_pressed[MOUSE_LEFT];
-        mouse_pressed[MOUSE_LEFT] = 0;
-        return key_state;
-    }
-
-    return -1;
-}
-
-/* Returns 1 once when 'key' is released, 0 otherwise */
-int is_mouse_released(int key)
-{
-    int key_state = 0;
-    switch (key)
-    {
-    case MOUSE_LEFT:
-        key_state = mouse_released[MOUSE_LEFT];
-        mouse_released[MOUSE_LEFT] = 0;
-        return key_state;
-    }
-
-    return -1;
-}
-
-/* Returns 1 as long as 'key' is down, 0 otherwise */
-int is_mouse_down(int key)
-{
-    switch (key)
-    {
-    case MOUSE_RIGHT:
-        return mouse_down[MOUSE_RIGHT];
-    }
-
-    return -1;
-}
-
-
-/*******************************************************************************
- *
- * Utils
- *
- ******************************************************************************/
-
-
-void window_center(GLFWwindow *window)
-{
-    GLFWmonitor *monitor = glfwGetPrimaryMonitor();
-
-    if (!monitor)
-        return;
-
-    const GLFWvidmode *mode = glfwGetVideoMode(monitor);
-    if (!mode)
-        return;
-
-    int monitor_x, monitor_y;
-    glfwGetMonitorPos(monitor, &monitor_x, &monitor_y);
-
-    int window_width, window_height;
-    glfwGetWindowSize(window, &window_width, &window_height);
-
-    glfwSetWindowPos(
-        window,
-        monitor_x + (mode->width - window_width) / 2,
-        monitor_y + (mode->height - window_height) / 2
-    );
-}
-
-void window_initialize(void)
-{
-    /* Configure GLFW */
-
-    if (!glfwInit())
-    {
-        printf("[ERROR] Failed to initialize glfw\n");
-        exit(1);
-    }
-
-    glfwWindowHint(GLFW_SAMPLES, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-
-    window = glfwCreateWindow(window_w, window_h, "GLFW Window", NULL, NULL);
-
-    if (!window)
-    {
-        printf("[ERROR] Failed to initialize window\n");
-        exit(1);
-    }
-
-    window_center(window);
-    glfwSwapInterval(1);
-    glfwMakeContextCurrent(window);
-
-    glfwSetKeyCallback(window, key_callback);
-    glfwSetCursorPosCallback(window, cursor_position_callback);
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
-
-    /* Configure OpenGL */
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
-    glEnable(GL_MULTISAMPLE);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-}
 
 void vec2f_norm(double vec[2], double uvec[2])
 {
@@ -630,7 +429,7 @@ void world_resolve_rect_collision(void)
 void init_circle(void)
 {
     double size = world.cell_size / 2;
-    p_circle = new_circle((window_w  - size) / 2, (window_h - size) / 2, size);
+    p_circle = new_circle((window->width  - size) / 2, (window->height - size) / 2, size);
 }
 
 void update_circle(void)
@@ -649,7 +448,7 @@ void update_circle(void)
 void init_rect(void)
 {
     double size = world.cell_size;
-    p_rect = new_rect((window_w  - size) / 2, (window_h - size) / 2, size);
+    p_rect = new_rect((window->width  - size) / 2, (window->height - size) / 2, size);
 }
 
 void update_rect(void)
@@ -669,23 +468,22 @@ int main(int argc, char **argv)
 {
     srand(42);
 
-    memset(key_down, 0, 26 * sizeof(int));
-    memset(key_pressed, 0, 26 * sizeof(int));
+    window = new_window(1500, 1000);
+    window_center(window->view);
 
-    window_initialize();
     world_init("worlds/world1.txt");
 
     init_rect();
     init_circle();
 
-    while (!glfwWindowShouldClose(window))
+    while (!glfwWindowShouldClose(window->view))
     {
-        glfwGetFramebufferSize(window, &window_w, &window_h);
-        glViewport(0, 0, window_w, window_h);
+        glfwGetFramebufferSize(window->view, &window->width, &window->height);
+        glViewport(0, 0, window->width, window->height);
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluOrtho2D(0, window_w, 0, window_h);
+        gluOrtho2D(0, window->width, 0, window->height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         world_draw_region_rect();
@@ -700,13 +498,13 @@ int main(int argc, char **argv)
         world_resolve_circle_collision();
 
         if (is_key_pressed(GLFW_KEY_Q))
-            glfwSetWindowShouldClose(window, GLFW_TRUE);
+            glfwSetWindowShouldClose(window->view, GLFW_TRUE);
 
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(window->view);
         glfwPollEvents();
     }
 
-    glfwDestroyWindow(window);
+    glfwDestroyWindow(window->view);
     glfwTerminate();
 
     return 0;
