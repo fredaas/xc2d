@@ -11,15 +11,15 @@ struct Rect {
     double size;
     double points[8];
     double r;
-
-    void (*draw)(Rect *self);
-    void (*move_left)(Rect *self);
-    void (*move_right)(Rect *self);
-    void (*move_forward)(Rect *self);
-    void (*move_backward)(Rect *self);
-    void (*minpoint)(Rect *self, double x, double y, double *nx, double *ny);
 };
 
 Rect *new_rect(double cx, double cy, double size);
+void rect_create_shape(Rect *self);
+void rect_draw(Rect *self);
+void rect_move_left(Rect *self);
+void rect_move_right(Rect *self);
+void rect_move_forward(Rect *self);
+void rect_move_backward(Rect *self);
+void rect_minpoint(Rect *self, double x, double y, double *nx, double *ny);
 
 #endif /* RECT_H */

@@ -181,14 +181,14 @@ void world_draw(void)
     for (int i = 0; i < n_rects; i++)
     {
         Rect *rect = rects[i];
-        rect->draw(rect);
+        rect_draw(rect);
     }
 }
 
 void draw_circle_ray(Circle *circle, Rect *rect)
 {
     double nx, ny;
-    rect->minpoint(rect, circle->cx, circle->cy, &nx, &ny);
+    rect_minpoint(rect, circle->cx, circle->cy, &nx, &ny);
     glColor4f(1.0, 1.0, 1.0, 1.0);
     glLineWidth(1.0f);
     glBegin(GL_LINES);
@@ -203,7 +203,7 @@ void draw_rect_ray(Rect *r1, Rect *r2)
     double x = r1->cx + size / 2;
     double y = r1->cy + size / 2;
     double nx, ny;
-    r2->minpoint(r2, x, y, &nx, &ny);
+    rect_minpoint(r2, x, y, &nx, &ny);
     glColor4f(1.0, 1.0, 1.0, 1.0);
     glLineWidth(1.0f);
     glBegin(GL_LINES);
@@ -222,7 +222,7 @@ void draw_rect_normal(Rect *r1, Rect *r2)
     double cy1 = y1 + s1 / 2;
 
     double nx, ny;
-    r2->minpoint(r2, cx1, cy1, &nx, &ny);
+    rect_minpoint(r2, cx1, cy1, &nx, &ny);
 
     double vec[2] = { nx - cx1, ny - cy1 };
 
@@ -273,7 +273,7 @@ void collide_rect_rect(Rect *r1, Rect *r2)
     double cy1 = y1 + s1 / 2;
 
     double nx, ny;
-    r2->minpoint(r2, cx1, cy1, &nx, &ny);
+    rect_minpoint(r2, cx1, cy1, &nx, &ny);
 
     double vec[2] = { nx - cx1, ny - cy1 };
 
@@ -325,7 +325,7 @@ void draw_circle(double x, double y, double size)
 int collide_circle_rect(Circle *circle, Rect *rect)
 {
     double nx, ny;
-    rect->minpoint(rect, circle->cx, circle->cy, &nx, &ny);
+    rect_minpoint(rect, circle->cx, circle->cy, &nx, &ny);
 
     double vec[2] = { nx - circle->cx, ny - circle->cy };
     double overlap = circle->size - vec2_size(vec);
@@ -443,14 +443,14 @@ void init_rect(void)
 void update_rect(void)
 {
     if (is_key_down(GLFW_KEY_A))
-        p_rect->move_left(p_rect);
+        rect_move_left(p_rect);
     if (is_key_down(GLFW_KEY_D))
-        p_rect->move_right(p_rect);
+        rect_move_right(p_rect);
     if (is_key_down(GLFW_KEY_W))
-        p_rect->move_forward(p_rect);
+        rect_move_forward(p_rect);
     if (is_key_down(GLFW_KEY_S))
-        p_rect->move_backward(p_rect);
-    p_rect->draw(p_rect);
+        rect_move_backward(p_rect);
+    rect_draw(p_rect);
 }
 
 int main(int argc, char **argv)
