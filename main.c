@@ -39,9 +39,6 @@ World world;
 Circle *p_circle = NULL;
 Rect *p_rect = NULL;
 
-/* Extracts 'k' bits from 'n' starting at position 'p' */
-#define biso(n, k, p) (((1 << (k)) - 1) & (n) >> (p))
-
 void set_drawcolor(int hex)
 {
     glColor4f(
