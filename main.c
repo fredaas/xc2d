@@ -342,19 +342,23 @@ int collide_circle_rect(Circle *circle, Rect *rect)
     return 0;
 }
 
+Rect *cell(int x, int y)
+{
+    if ((x < 0) || (x >= world.n_cells_x) || (y < 0) || (y >= world.n_cells_y))
+        return NULL;
+    return world.cells[y * world.n_cells_x + x];
+}
+
 void world_resolve_circle_collision(void)
 {
     int x, y;
     world_cell2i(p_circle->cx, p_circle->cy, &x, &y);
 
-    for (int dx = -1; dx <= 1; dx++)
+    for (int dy = -1; dy <= 1; dy++)
     {
-        for (int dy = -1; dy <= 1; dy++)
+        for (int dx = -1; dx <= 1; dx++)
         {
-            int i = (y + dy) * world.n_cells_x + x + dx;
-            if ((i < 0) || (i > world.n_cells_x * world.n_cells_y))
-                continue;
-            Rect *rect = world.cells[i];
+            Rect *rect = cell(x + dx, y + dy);
             if (rect != NULL)
             {
                 collide_circle_rect(p_circle, rect);
@@ -362,14 +366,6 @@ void world_resolve_circle_collision(void)
             }
         }
     }
-}
-
-Rect *cell(double x, double y)
-{
-    int i = y * world.n_cells_x + x;
-    if ((i < 0) || (i > world.n_cells_x * world.n_cells_y))
-        return NULL;
-    return world.cells[i];
 }
 
 void world_resolve_rect_collision(void)
