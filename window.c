@@ -186,6 +186,7 @@ Window * new_window(int width, int height)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
     glEnable(GL_MULTISAMPLE);
+    glLineWidth(1.0f);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     return window;

@@ -39,7 +39,7 @@ World world;
 Circle *p_circle = NULL;
 Rect *p_rect = NULL;
 
-void set_drawcolor(int hex)
+void draw_color(int hex)
 {
     glColor4f(
         biso(hex, 8, 24) / 256.0,
@@ -140,17 +140,14 @@ void world_init(char *path)
     }
 }
 
-void draw_square(double x, double y, int hex)
+void draw_square(double x, double y, double size)
 {
-    double size = world.cell_size;
     double points[8] = {
         x, y,
         x, y + size,
         x + size, y + size,
         x + size, y
     };
-    set_drawcolor(hex);
-    glLineWidth(1.0f);
     glBegin(GL_LINES);
     for (int i = 0; i < 4; i++)
     {
@@ -164,26 +161,29 @@ void draw_square(double x, double y, int hex)
     glEnd();
 }
 
-void world_draw_region_circle(void)
+void world_draw_region(double x, double y, int hex)
 {
-    double cell_size = world.cell_size;
-    double x = floor(p_circle->cx / cell_size) * cell_size;
-    double y = floor(p_circle->cy / cell_size) * cell_size;
-    for (int dy = -1; dy <= 1; dy++)
-        for (int dx = -1; dx <= 1; dx++)
-            draw_square(x + dx * cell_size, y + dy * cell_size, 0xff0000ff);
-}
+    int dim = 3;
+    int n_lines = dim - 1;
+    int size = world.cell_size * dim;
 
-void world_draw_region_rect(void)
-{
-    double cell_size = world.cell_size;
-    double x = p_rect->cx + cell_size / 2;
-    double y = p_rect->cy + cell_size / 2;
-    x = floor(x / cell_size) * cell_size;
-    y = floor(y / cell_size) * cell_size;
-    for (int dy = -1; dy <= 1; dy++)
-        for (int dx = -1; dx <= 1; dx++)
-            draw_square(x + dx * cell_size, y + dy * cell_size, 0x00ff00ff);
+    double cx = x - size / 2;
+    double cy = y - size / 2;
+
+    draw_color(hex);
+    draw_square(cx, cy, size);
+    glBegin(GL_LINES);
+    for (int i = 1; i <= n_lines; i++)
+    {
+        glVertex2f(cx + i * world.cell_size, y - size / 2);
+        glVertex2f(cx + i * world.cell_size, y + size / 2);
+    }
+    for (int i = 1; i <= n_lines; i++)
+    {
+        glVertex2f(x - size / 2, cy + i * world.cell_size);
+        glVertex2f(x + size / 2, cy + i * world.cell_size);
+    }
+    glEnd();
 }
 
 void world_draw(void)
@@ -200,7 +200,6 @@ void draw_circle_ray(Circle *circle, Rect *rect)
     double nx, ny;
     rect_minpoint(rect, circle->cx, circle->cy, &nx, &ny);
     glColor4f(1.0, 1.0, 1.0, 1.0);
-    glLineWidth(1.0f);
     glBegin(GL_LINES);
     glVertex2f(nx, ny);
     glVertex2f(circle->cx , circle->cy);
@@ -215,7 +214,6 @@ void draw_rect_ray(Rect *r1, Rect *r2)
     double nx, ny;
     rect_minpoint(r2, x, y, &nx, &ny);
     glColor4f(1.0, 1.0, 1.0, 1.0);
-    glLineWidth(1.0f);
     glBegin(GL_LINES);
     glVertex2f(nx, ny);
     glVertex2f(x, y);
@@ -237,7 +235,6 @@ void draw_rect_normal(Rect *r1, Rect *r2)
     double vec[2] = { nx - cx1, ny - cy1 };
 
     glColor4f(1.0, 0.0, 0.0, 1.0);
-    glLineWidth(1.0f);
     glBegin(GL_LINES);
 
     if (fabs(vec[0]) > fabs(vec[1]))
@@ -321,7 +318,6 @@ void draw_circle(double x, double y, double size)
     double delta = PI * 2 / H;
     double rad = 0;
     glColor4f(1.0, 0.0, 0.0, 1.0);
-    glLineWidth(1.0f);
     glBegin(GL_LINES);
     for (int i = 0; i < H; i++)
     {
@@ -481,10 +477,10 @@ int main(int argc, char **argv)
         gluOrtho2D(0, window->width, 0, window->height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        world_draw_region_rect();
-        world_draw_region_circle();
-
         world_draw();
+
+        world_draw_region(p_circle->cx, p_circle->cy, 0xffcb67aa);
+        world_draw_region(p_rect->cx + p_rect->size / 2, p_rect->cy + p_rect->size / 2, 0x67ffefaa);
 
         update_rect();
         update_circle();
