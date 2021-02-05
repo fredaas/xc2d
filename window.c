@@ -15,6 +15,10 @@ int mouse_pressed[2];
 int window_w;
 int window_h;
 
+double zoom = 1.0;
+double zoom_max = 1.0 + 1.0;
+double zoom_min = 1.0 - 0.5;
+
 float mx = 0.0;
 float my = 0.0;
 
@@ -41,6 +45,27 @@ int is_key_pressed(int key)
     int b = key_down[i];
     key_down[i] = 0;
     return b;
+}
+
+double window_zoom(void)
+{
+    return zoom;
+}
+
+static void scroll_callback(GLFWwindow *window, double dx, double dy)
+{
+    if (dy < 0)
+    {
+        zoom -= 0.1;
+        if (zoom < zoom_min)
+            zoom = zoom_min;
+    }
+    else
+    {
+        zoom += 0.1;
+        if (zoom > zoom_max)
+            zoom = zoom_max;
+    }
 }
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action,
@@ -183,6 +208,7 @@ Window * new_window(int width, int height)
     glfwSetKeyCallback(window->view, key_callback);
     glfwSetCursorPosCallback(window->view, cursor_position_callback);
     glfwSetMouseButtonCallback(window->view, mouse_button_callback);
+    glfwSetScrollCallback(window->view, scroll_callback);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);

@@ -20,5 +20,6 @@ Window * new_window(int width, int height);
 void window_center(GLFWwindow *view);
 int is_key_down(int key);
 int is_key_pressed(int key);
+double window_zoom(void);
 
 #endif /* WINDOW_H */

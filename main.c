@@ -486,6 +486,8 @@ int main(int argc, char **argv)
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         gluOrtho2D(0, window->width, 0, window->height);
+        double zoom = window_zoom();
+        glScaled(zoom, zoom, zoom);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         world_draw();
