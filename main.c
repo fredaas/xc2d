@@ -377,8 +377,9 @@ void world_resolve_circle_collision(void)
 void world_resolve_rect_collision(void)
 {
     int x, y;
-    double size = p_rect->size;
-    world_cell2i(p_rect->cx + size / 2, p_rect->cy + size / 2, &x, &y);
+    world_cell2i(
+        p_rect->cx + p_rect->size / 2,
+        p_rect->cy + p_rect->size / 2, &x, &y);
 
     /* Center */
     for (int dy = -1; dy <= 1; dy++)
