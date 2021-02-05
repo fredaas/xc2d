@@ -420,7 +420,9 @@ void world_resolve_rect_collision(void)
 void init_circle(void)
 {
     double size = world.cell_size / 2;
-    p_circle = new_circle((window->width  - size) / 2, (window->height - size) / 2, size);
+    p_circle = new_circle(
+        (window->width  - size) / 2,
+        (window->height - size) / 2, size);
 }
 
 void update_circle(void)
@@ -439,7 +441,9 @@ void update_circle(void)
 void init_rect(void)
 {
     double size = world.cell_size;
-    p_rect = new_rect((window->width  - size) / 2, (window->height - size) / 2, size);
+    p_rect = new_rect(
+        (window->width  - size) / 2,
+        (window->height - size) / 2, size);
 }
 
 void update_rect(void)
@@ -480,7 +484,9 @@ int main(int argc, char **argv)
         world_draw();
 
         world_draw_region(p_circle->cx, p_circle->cy, 0xffcb67aa);
-        world_draw_region(p_rect->cx + p_rect->size / 2, p_rect->cy + p_rect->size / 2, 0x67ffefaa);
+        world_draw_region(
+            p_rect->cx + p_rect->size / 2,
+            p_rect->cy + p_rect->size / 2, 0x67ffefaa);
 
         update_rect();
         update_circle();

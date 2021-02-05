@@ -63,7 +63,8 @@ static void cursor_position_callback(GLFWwindow *window, double x, double y)
     my = window_h - y;
 }
 
-static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+static void mouse_button_callback(GLFWwindow* window, int button, int action,
+    int mods)
 {
     if (action == GLFW_PRESS)
     {
