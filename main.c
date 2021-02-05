@@ -163,25 +163,31 @@ void draw_square(double x, double y, double size)
 
 void world_draw_region(double x, double y, int hex)
 {
-    int dim = 3;
-    int n_lines = dim - 1;
-    int size = world.cell_size * dim;
+    int cell_size = world.cell_size;
+    int region_dim = 3;
+    int region_size = cell_size * region_dim;
 
-    double cx = x - size / 2;
-    double cy = y - size / 2;
+    /* Translate (x, y) to center cell point */
+    x = floor(x / cell_size) * cell_size + cell_size / 2.0;
+    y = floor(y / cell_size) * cell_size + cell_size / 2.0;
 
+    /* Set region local origin */
+    double cx = x - region_size / 2;
+    double cy = y - region_size / 2;
+
+    /* Draw grid */
     draw_color(hex);
-    draw_square(cx, cy, size);
+    draw_square(cx, cy, region_size);
     glBegin(GL_LINES);
-    for (int i = 1; i <= n_lines; i++)
+    for (int i = 1; i <= (region_dim - 1); i++)
     {
-        glVertex2f(cx + i * world.cell_size, y - size / 2);
-        glVertex2f(cx + i * world.cell_size, y + size / 2);
+        glVertex2f(cx + i * cell_size, y - region_size / 2);
+        glVertex2f(cx + i * cell_size, y + region_size / 2);
     }
-    for (int i = 1; i <= n_lines; i++)
+    for (int i = 1; i <= (region_dim - 1); i++)
     {
-        glVertex2f(x - size / 2, cy + i * world.cell_size);
-        glVertex2f(x + size / 2, cy + i * world.cell_size);
+        glVertex2f(x - region_size / 2, cy + i * cell_size);
+        glVertex2f(x + region_size / 2, cy + i * cell_size);
     }
     glEnd();
 }
