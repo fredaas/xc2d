@@ -10,14 +10,13 @@ int key_down[26];
 int key_pressed[26];
 
 /* Mouse */
-enum { MOUSE_LEFT, MOUSE_RIGHT };
 double screen_mx = 0.0;
 double screen_my = 0.0;
 double world_mx = 0.0;
 double world_my = 0.0;
-int mouse_down[2];
-int mouse_released[2];
-int mouse_pressed[2];
+int mouse_down[2] = { 0, 0 };
+int mouse_released[2] = { 0, 0 };
+int mouse_pressed[2] = { 0, 0 };
 
 double window_width = 0;
 double window_height = 0;
@@ -55,17 +54,7 @@ double window_zoom(void)
 void window_mouse_pos(double *x, double *y)
 {
     *x = screen_mx;
-    *y = window_height - screen_my;
-}
-
-void window_world2screen(void)
-{
-    /* TODO: Implement this */
-}
-
-void window_screen2world(void)
-{
-    /* TODO: Implement this */
+    *y = screen_my;
 }
 
 static void scroll_callback(GLFWwindow *window, double dx, double dy)
@@ -101,7 +90,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action,
 static void cursor_position_callback(GLFWwindow *window, double x, double y)
 {
     screen_mx = x;
-    screen_my = y;
+    screen_my = window_height - y;
 }
 
 static void mouse_button_callback(GLFWwindow* window, int button, int action,
@@ -109,30 +98,46 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action,
 {
     if (action == GLFW_PRESS)
     {
-        if (button == GLFW_MOUSE_BUTTON_RIGHT)
+        switch (button)
+        {
+        case GLFW_MOUSE_BUTTON_RIGHT:
             mouse_down[MOUSE_RIGHT] = 1;
-        if (button == GLFW_MOUSE_BUTTON_LEFT)
+            mouse_pressed[MOUSE_RIGHT] = 1;
+            break;
+        case GLFW_MOUSE_BUTTON_LEFT:
+            mouse_down[MOUSE_LEFT] = 1;
             mouse_pressed[MOUSE_LEFT] = 1;
+            break;
+        }
     }
     if (action == GLFW_RELEASE)
     {
-        if (button == GLFW_MOUSE_BUTTON_RIGHT)
+        switch (button)
+        {
+        case GLFW_MOUSE_BUTTON_RIGHT:
             mouse_down[MOUSE_RIGHT] = 0;
-        if (button == GLFW_MOUSE_BUTTON_LEFT)
-            mouse_released[MOUSE_LEFT] = 1;
+            break;
+        case GLFW_MOUSE_BUTTON_LEFT:
+            mouse_down[MOUSE_LEFT] = 0;
+            break;
+        }
     }
 }
 
 /* Returns 1 once when 'key' is pressed, 0 otherwise */
-static int is_mouse_pressed(int key)
+int is_mouse_pressed(int key)
 {
-    int key_state = 0;
+    int value = 0;
     switch (key)
     {
+    case MOUSE_RIGHT:
+        value = mouse_pressed[MOUSE_RIGHT];
+        mouse_pressed[MOUSE_RIGHT] = 0;
+        return value;
     case MOUSE_LEFT:
-        key_state = mouse_pressed[MOUSE_LEFT];
+        value = mouse_pressed[MOUSE_LEFT];
         mouse_pressed[MOUSE_LEFT] = 0;
-        return key_state;
+        return value;
     }
 
     return -1;
@@ -141,25 +146,23 @@ static int is_mouse_pressed(int key)
 /* Returns 1 once when 'key' is released, 0 otherwise */
 static int is_mouse_released(int key)
 {
-    int key_state = 0;
     switch (key)
     {
-    case MOUSE_LEFT:
-        key_state = mouse_released[MOUSE_LEFT];
-        mouse_released[MOUSE_LEFT] = 0;
-        return key_state;
+        /* TODO: Implement this */
     }
 
     return -1;
 }
 
 /* Returns 1 as long as 'key' is down, 0 otherwise */
-static int is_mouse_down(int key)
+int is_mouse_down(int key)
 {
     switch (key)
     {
     case MOUSE_RIGHT:
         return mouse_down[MOUSE_RIGHT];
+    case MOUSE_LEFT:
+        return mouse_down[MOUSE_LEFT];
     }
 
     return -1;

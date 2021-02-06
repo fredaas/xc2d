@@ -161,11 +161,10 @@ void draw_square(double x, double y, double size)
     glEnd();
 }
 
-void world_draw_region(double x, double y, int hex)
+void world_draw_region(double x, double y, int size, int hex)
 {
     int cell_size = world.cell_size;
-    int region_dim = 3;
-    int region_size = cell_size * region_dim;
+    int region_size = cell_size * size;
 
     /* Translate (x, y) to center cell point */
     x = floor(x / cell_size) * cell_size + cell_size / 2.0;
@@ -179,12 +178,12 @@ void world_draw_region(double x, double y, int hex)
     draw_color(hex);
     draw_square(cx, cy, region_size);
     glBegin(GL_LINES);
-    for (int i = 1; i <= (region_dim - 1); i++)
+    for (int i = 1; i <= (size - 1); i++)
     {
         glVertex2f(cx + i * cell_size, y - region_size / 2);
         glVertex2f(cx + i * cell_size, y + region_size / 2);
     }
-    for (int i = 1; i <= (region_dim - 1); i++)
+    for (int i = 1; i <= (size - 1); i++)
     {
         glVertex2f(x - region_size / 2, cy + i * cell_size);
         glVertex2f(x + region_size / 2, cy + i * cell_size);
@@ -466,6 +465,24 @@ void update_rect(void)
     rect_draw(p_rect);
 }
 
+// void window_world2screen(double x, double y, double *tx, double *ty)
+// {
+//     *tx = x - world_dx;
+//     *ty = y - world_dy;
+// }
+
+// void window_screen2world(double x, double y, double *tx, double *ty)
+// {
+//     *tx = x + world_dx;
+//     *ty = y + world_dy;
+// }
+
+/* Screen offsets */
+double world_dx = 0.0;
+double world_dy = 0.0;
+double pan_sx = 0.0;
+double pan_sy = 0.0;
+
 int main(int argc, char **argv)
 {
     srand(42);
@@ -486,22 +503,39 @@ int main(int argc, char **argv)
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         gluOrtho2D(0, window->width, 0, window->height);
-        double zoom = window_zoom();
-        glScaled(zoom, zoom, zoom);
+        // double zoom = window_zoom();
+        // glScaled(zoom, zoom, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        double mx, my;
+        if (is_mouse_pressed(MOUSE_LEFT))
+        {
+            window_mouse_pos(&pan_sx, &pan_sy);
+        }
 
-        window_mouse_pos(&mx, &my);
+        if (is_mouse_down(MOUSE_LEFT))
+        {
+            double mx, my;
+            window_mouse_pos(&mx, &my);
+            world_dx += (mx - pan_sx);
+            world_dy += (my - pan_sy);
+            pan_sx = mx;
+            pan_sy = my;
+        }
 
-        printf("%.2lf %.2lf\n", mx, my);
+        glTranslated(world_dx, world_dy, 0);
 
         world_draw();
 
-        world_draw_region(p_circle->cx, p_circle->cy, 0xffcb67aa);
+        world_draw_region(
+            p_circle->cx,
+            p_circle->cy,
+            3, 0xffcb67aa
+        );
         world_draw_region(
             p_rect->cx + p_rect->size / 2,
-            p_rect->cy + p_rect->size / 2, 0x67ffefaa);
+            p_rect->cy + p_rect->size / 2,
+            3, 0x67ffefaa
+        );
 
         update_rect();
         update_circle();
