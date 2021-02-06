@@ -1,26 +1,26 @@
 #include "window.h"
 
-enum {
-    MOUSE_LEFT,
-    MOUSE_RIGHT
-};
-
-int key_down[26];
-int key_pressed[26];
-
-int mouse_down[2];
-int mouse_released[2];
-int mouse_pressed[2];
-
-int window_w;
-int window_h;
-
+/* Zoom */
 double zoom = 1.0;
 double zoom_max = 1.0 + 1.0;
 double zoom_min = 1.0 - 0.5;
 
-float mx = 0.0;
-float my = 0.0;
+/* Keys */
+int key_down[26];
+int key_pressed[26];
+
+/* Mouse */
+enum { MOUSE_LEFT, MOUSE_RIGHT };
+double screen_mx = 0.0;
+double screen_my = 0.0;
+double world_mx = 0.0;
+double world_my = 0.0;
+int mouse_down[2];
+int mouse_released[2];
+int mouse_pressed[2];
+
+double window_width = 0;
+double window_height = 0;
 
 static void set_key_down(int key, int b)
 {
@@ -50,6 +50,22 @@ int is_key_pressed(int key)
 double window_zoom(void)
 {
     return zoom;
+}
+
+void window_mouse_pos(double *x, double *y)
+{
+    *x = screen_mx;
+    *y = window_height - screen_my;
+}
+
+void window_world2screen(void)
+{
+    /* TODO: Implement this */
+}
+
+void window_screen2world(void)
+{
+    /* TODO: Implement this */
 }
 
 static void scroll_callback(GLFWwindow *window, double dx, double dy)
@@ -84,8 +100,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action,
 
 static void cursor_position_callback(GLFWwindow *window, double x, double y)
 {
-    mx = x;
-    my = window_h - y;
+    screen_mx = x;
+    screen_my = y;
 }
 
 static void mouse_button_callback(GLFWwindow* window, int button, int action,
@@ -186,6 +202,9 @@ Window * new_window(int width, int height)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
+    window_width = width;
+    window_height = height;
 
     memset(key_down, 0, 26 * sizeof(int));
     memset(key_pressed, 0, 26 * sizeof(int));

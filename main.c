@@ -490,6 +490,12 @@ int main(int argc, char **argv)
         glScaled(zoom, zoom, zoom);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        double mx, my;
+
+        window_mouse_pos(&mx, &my);
+
+        printf("%.2lf %.2lf\n", mx, my);
+
         world_draw();
 
         world_draw_region(p_circle->cx, p_circle->cy, 0xffcb67aa);
