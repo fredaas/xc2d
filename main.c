@@ -465,23 +465,55 @@ void update_rect(void)
     rect_draw(p_rect);
 }
 
-// void window_world2screen(double x, double y, double *tx, double *ty)
-// {
-//     *tx = x - world_dx;
-//     *ty = y - world_dy;
-// }
-
-// void window_screen2world(double x, double y, double *tx, double *ty)
-// {
-//     *tx = x + world_dx;
-//     *ty = y + world_dy;
-// }
 
 /* Screen offsets */
-double world_dx = 0.0;
-double world_dy = 0.0;
-double pan_sx = 0.0;
-double pan_sy = 0.0;
+double world_x = 0.0;
+double world_y = 0.0;
+double pan_x = 0.0;
+double pan_y = 0.0;
+double scale = 1.0;
+
+void window_world2screen(double x, double y, double *tx, double *ty)
+{
+    *tx = (x + world_x) * scale;
+    *ty = (y + world_y) * scale;
+}
+
+void window_screen2world(double x, double y, double *tx, double *ty)
+{
+    *tx = (x / scale) - world_x;
+    *ty = (y / scale) - world_y;
+}
+
+void world_update_pan(void)
+{
+    if (is_mouse_pressed(MOUSE_LEFT))
+    {
+        window_mouse_pos(&pan_x, &pan_y);
+    }
+
+    if (is_mouse_down(MOUSE_LEFT))
+    {
+        double mx, my;
+        window_mouse_pos(&mx, &my);
+        world_x += (mx - pan_x) / scale;
+        world_y += (my - pan_y) / scale;
+        pan_x = mx;
+        pan_y = my;
+    }
+}
+
+void world_update_scale(void)
+{
+    double x, y, wx0, wy0, wx1, wy1;
+    window_mouse_pos(&x, &y);
+    window_screen2world(x, y, &wx0, &wy0);
+    scale = window_zoom();
+    glScaled(scale, scale, 1);
+    window_screen2world(x, y, &wx1, &wy1);
+    world_x -= (wx0 - wx1);
+    world_y -= (wy0 - wy1);
+}
 
 int main(int argc, char **argv)
 {
@@ -503,26 +535,13 @@ int main(int argc, char **argv)
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         gluOrtho2D(0, window->width, 0, window->height);
-        // double zoom = window_zoom();
-        // glScaled(zoom, zoom, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        if (is_mouse_pressed(MOUSE_LEFT))
-        {
-            window_mouse_pos(&pan_sx, &pan_sy);
-        }
+        world_update_pan();
 
-        if (is_mouse_down(MOUSE_LEFT))
-        {
-            double mx, my;
-            window_mouse_pos(&mx, &my);
-            world_dx += (mx - pan_sx);
-            world_dy += (my - pan_sy);
-            pan_sx = mx;
-            pan_sy = my;
-        }
+        world_update_scale();
 
-        glTranslated(world_dx, world_dy, 0);
+        glTranslated(world_x, world_y, 0);
 
         world_draw();
 
