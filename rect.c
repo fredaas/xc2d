@@ -21,7 +21,6 @@ void rect_create_shape(Rect *self)
         size, size,
         size, 0
     };
-
     memcpy(self->points, points, sizeof(double) * 8);
 }
 
