@@ -1,12 +1,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <GLFW/glfw3.h>
-#include <GL/gl.h>
+#include "utils.h"
 
 enum { MOUSE_LEFT, MOUSE_RIGHT };
 
