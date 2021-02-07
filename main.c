@@ -317,17 +317,17 @@ void collide_rect_rect(Rect *r1, Rect *r2)
     }
 }
 
-void draw_circle(double x, double y, double size)
+void draw_circle(double x, double y, double size, int hex)
 {
     int H = 15;
     double delta = PI * 2 / H;
     double rad = 0;
-    glColor4f(1.0, 0.0, 0.0, 1.0);
+    draw_color(hex);
     glBegin(GL_LINES);
     for (int i = 0; i < H; i++)
     {
-        glVertex2f(x + cos(rad) * size, x + sin(rad) * size);
-        glVertex2f(x + cos(rad + delta) * size, x + sin(rad + delta) * size);
+        glVertex2f(x + cos(rad) * size, y + sin(rad) * size);
+        glVertex2f(x + cos(rad + delta) * size, y + sin(rad + delta) * size);
         rad += delta;
     }
     glEnd();
@@ -542,6 +542,14 @@ int main(int argc, char **argv)
         world_update_scale();
 
         glTranslated(world_x, world_y, 0);
+
+        if (is_mouse_down(MOUSE_LEFT))
+        {
+            double mx, my, tx, ty;
+            window_mouse_pos(&mx, &my);
+            window_screen2world(mx, my, &tx, &ty);
+            draw_circle(tx, ty, 10, 0xff0000ff);
+        }
 
         world_draw();
 
