@@ -14,13 +14,6 @@ World *world = NULL;
 Circle *p_circle = NULL;
 Rect *p_rect = NULL;
 
-double walltime(void)
-{
-    static struct timeval t;
-    gettimeofday(&t, NULL);
-    return ((double)t.tv_sec + (double)t.tv_usec * 1.0e-06);
-}
-
 void collide_rect_rect(Rect *r1, Rect *r2)
 {
     double s1 = r1->size;

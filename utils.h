@@ -25,9 +25,11 @@
 
 #define PI (double)3.141592654
 
-#define rand_float(a, b) (a) + (rand() / (float) RAND_MAX) * ((b) - (a))
+#define rand_float(a, b) (a) + (rand() / (float)RAND_MAX) * ((b) - (a))
 
 #define msec(sec) (double)((sec) * 1.0e+3)
 #define usec(sec) (double)((sec) * 1.0e+6)
+
+double walltime(void);
 
 #endif /* UTILS_H */
