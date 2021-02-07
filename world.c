@@ -84,7 +84,7 @@ World * new_world(char *path)
     );
     memcpy(&(world->blocks[0]), blocks, world->n_blocks * sizeof(Rect *));
 
-    // /* Initialize world grid */
+    /* Initialize world grid */
     world->cells = (Rect **)malloc(
         world->n_cells_x * world->n_cells_y * sizeof(Rect *)
     );
