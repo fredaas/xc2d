@@ -3,7 +3,7 @@
 /* Zoom */
 double zoom = 1.0;
 double zoom_max = 1.0 + 1.0;
-double zoom_min = 1.0 - 0.5;
+double zoom_min = 1.0 - 0.75;
 
 /* Keys */
 int key_down[26];
