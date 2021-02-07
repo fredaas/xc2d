@@ -469,8 +469,6 @@ void update_rect(void)
 /* Screen offsets */
 double world_x = 0.0;
 double world_y = 0.0;
-double pan_x = 0.0;
-double pan_y = 0.0;
 double scale = 1.0;
 
 void window_world2screen(double x, double y, double *tx, double *ty)
@@ -487,19 +485,21 @@ void window_screen2world(double x, double y, double *tx, double *ty)
 
 void world_update_pan(void)
 {
+    static double px, py;
+
     if (is_mouse_pressed(MOUSE_LEFT))
     {
-        window_mouse_pos(&pan_x, &pan_y);
+        window_mouse_pos(&px, &py);
     }
 
     if (is_mouse_down(MOUSE_LEFT))
     {
         double mx, my;
         window_mouse_pos(&mx, &my);
-        world_x += (mx - pan_x) / scale;
-        world_y += (my - pan_y) / scale;
-        pan_x = mx;
-        pan_y = my;
+        world_x += (mx - px) / scale;
+        world_y += (my - py) / scale;
+        px = mx;
+        py = my;
     }
 }
 
