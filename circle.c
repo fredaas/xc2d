@@ -8,6 +8,8 @@ Circle *new_circle(double cx, double cy, double size)
     self->cy = cy;
     self->size = size;
     self->H = 15;
+    self->v = size * 2 * 4;
+    self->w = size / 4;
 
     circle_create_shape(self);
 
@@ -78,22 +80,22 @@ void circle_rotate(Circle *self, double delta)
 
 void circle_turn_left(Circle *self)
 {
-    circle_rotate(self, 0.001);
+    circle_rotate(self, dt * self->w);
 }
 
 void circle_turn_right(Circle *self)
 {
-    circle_rotate(self, -0.001);
+    circle_rotate(self, dt * -self->w);
 }
 
 void circle_move_forward(Circle *self)
 {
-    self->cx += cos(self->r) * 0.1;
-    self->cy += sin(self->r) * 0.1;
+    self->cx += cos(self->r) * self->v * dt;
+    self->cy += sin(self->r) * self->v * dt;
 }
 
 void circle_move_backward(Circle *self)
 {
-    self->cx -= cos(self->r) * 0.1;
-    self->cy -= sin(self->r) * 0.1;
+    self->cx -= cos(self->r) * self->v * dt;
+    self->cy -= sin(self->r) * self->v * dt;
 }

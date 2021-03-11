@@ -6,6 +6,7 @@ Rect *new_rect(double cx, double cy, double size)
     self->cx = cx;
     self->cy = cy;
     self->size = size;
+    self->v = size * 4;
 
     rect_create_shape(self);
 
@@ -26,19 +27,19 @@ void rect_create_shape(Rect *self)
 
 void rect_move_left(Rect *self)
 {
-    self->cx -= 0.1;
+    self->cx -= self->v * dt;
 }
 void rect_move_right(Rect *self)
 {
-    self->cx += 0.1;
+    self->cx += self->v * dt;
 }
 void rect_move_forward(Rect *self)
 {
-    self->cy += 0.1;
+    self->cy += self->v * dt;
 }
 void rect_move_backward(Rect *self)
 {
-    self->cy -= 0.1;
+    self->cy -= self->v * dt;
 }
 
 void rect_minpoint(Rect *self, double x, double y, double *nx, double *ny)

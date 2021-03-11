@@ -5,9 +5,7 @@
 #include "window.h"
 #include "world.h"
 #include "draw.h"
-
-#define FPS 60
-#define UPDATE_RATE 1000 / (float)FPS
+#include "deltatime.h"
 
 Window *window = NULL;
 World *world = NULL;
@@ -144,8 +142,9 @@ void init_circle(void)
 {
     double size = world->cell_size / 2;
     p_circle = new_circle(
-        (window->width  - size) / 2,
-        (window->height - size) / 2, size);
+        (window->width - size) / 2,
+        (window->height - size) / 2, size
+    );
 }
 
 void update_circle(void)
@@ -165,8 +164,9 @@ void init_rect(void)
 {
     double size = world->cell_size;
     p_rect = new_rect(
-        (window->width  - size) / 2,
-        (window->height - size) / 2, size);
+        (window->width - size) / 2,
+        (window->height - size) / 2, size
+    );
 }
 
 void update_rect(void)
@@ -207,6 +207,8 @@ int main(int argc, char **argv)
         world_update_pan(world);
         world_update_scale(world);
         glTranslated(world->x, world->y, 0);
+
+        dt_update();
 
         update_rect();
         update_circle();

@@ -12,6 +12,8 @@ struct Circle {
     double size; /* Radius */
     double *points;
     int H; /* Number of (x, y) points */
+    double v;
+    double w;
 };
 
 Circle *new_circle(double cx, double cy, double size);

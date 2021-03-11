@@ -11,6 +11,7 @@ struct Rect {
     double size;
     double points[8];
     double r;
+    double v;
 };
 
 Rect *new_rect(double cx, double cy, double size);

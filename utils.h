@@ -13,6 +13,8 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+#include "deltatime.h"
+
 /* Rotate (x, y) around (0, 0) by r radians */
 #define rotate_x(x, y, r) (x * cos(r) - y * sin(r))
 #define rotate_y(x, y, r) (x * sin(r) + y * cos(r))
