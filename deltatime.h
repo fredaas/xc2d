@@ -9,6 +9,7 @@ long dt_msec(void);
 long dt_sec(void);
 void dt_update(void);
 
+/* Defined in deltatime.c */
 extern double dt;
 
 #endif /* DELTATIME_H */
