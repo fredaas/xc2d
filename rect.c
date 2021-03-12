@@ -6,7 +6,7 @@ Rect *new_rect(double cx, double cy, double size)
     self->cx = cx;
     self->cy = cy;
     self->size = size;
-    self->v = size * 4;
+    self->v = size * 8;
 
     rect_create_shape(self);
 

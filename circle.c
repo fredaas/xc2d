@@ -8,7 +8,7 @@ Circle *new_circle(double cx, double cy, double size)
     self->cy = cy;
     self->size = size;
     self->H = 15;
-    self->v = size * 2 * 4;
+    self->v = size * 2 * 8;
     self->w = size / 4;
 
     circle_create_shape(self);
