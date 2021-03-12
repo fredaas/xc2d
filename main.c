@@ -109,9 +109,9 @@ void world_resolve_rect_collision(void)
         Rect *rect = world_cell(world, x, y + dy);
         if (rect != NULL)
         {
+            collide_rect_rect(p_rect, rect);
             draw_rect_ray(p_rect, rect);
             draw_rect_normal(p_rect, rect);
-            collide_rect_rect(p_rect, rect);
         }
     }
     /* Left */
