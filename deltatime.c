@@ -39,7 +39,7 @@ void dt_update(void)
     if (time == 0)
     {
         time = walltime;
-        dt = 0;
+        return;
     }
     double value = time;
     time = walltime;
