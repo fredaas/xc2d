@@ -182,6 +182,8 @@ void update_rect(void)
     rect_draw(p_rect);
 }
 
+int zoom_state = 0;
+
 int main(int argc, char **argv)
 {
     srand(42);
@@ -222,6 +224,29 @@ int main(int argc, char **argv)
             window_mouse_pos(&mx, &my);
             world_screen2world(world, mx, my, &tx, &ty);
             draw_circle(tx, ty, 10, 0xff0000ff);
+        }
+
+        if (is_key_pressed(GLFW_KEY_Z))
+            zoom_state = 1;
+
+        double zoom_target = window_zoom();
+
+        switch (zoom_state)
+        {
+        case 0:
+            break;
+        case 1:
+            if (zoom_target >= 1)
+                zoom_target = 0.25;
+            else if (zoom_target < 1)
+                zoom_target = 1.75;
+            window_zoom_target(zoom_target);
+            zoom_state = 2;
+            break;
+        case 2:
+            if (!window_update_zoom())
+                zoom_state = 0;
+            break;
         }
 
         world_draw(world);
