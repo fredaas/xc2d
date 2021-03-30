@@ -1,56 +1,47 @@
 #include "window.h"
 
 /* Zoom */
-double zoom = 1.0;
-double zoom_max = 1.0 + 1.0;
-double zoom_min = 1.0 - 0.75;
-double zoom_delta = 1.0;
-double zoom_target = 1.0;
+static double zoom = 1.0;
+static double zoom_max = 1.0 + 1.0;
+static double zoom_min = 1.0 - 0.75;
+static double zoom_delta = 1.0;
+static double zoom_target = 1.0;
 
 /* Keys */
-int key_down[26];
-int key_pressed[26];
+static int key_current[26] = { 0 };
+static int key_previous[26] = { 0 };
 
 /* Mouse */
-double screen_mx = 0.0;
-double screen_my = 0.0;
-double world_mx = 0.0;
-double world_my = 0.0;
-int mouse_down[2] = { 0, 0 };
-int mouse_released[2] = { 0, 0 };
-int mouse_pressed[2] = { 0, 0 };
+static double screen_mx = 0.0;
+static double screen_my = 0.0;
+static double world_mx = 0.0;
+static double world_my = 0.0;
+static int mouse_current[2];
+static int mouse_previous[2];
 
-double window_width = 0;
-double window_height = 0;
+/* Window */
+static double window_width = 0;
+static double window_height = 0;
 
-/* TODO: I/O functions implementing "pressed" functionality are cleared after the
-   first call to the function. A key press should persist until the end of the
-   main loop, the same goes for functions implementing "down" functionality,
-   which may clear the key at arbitrary points in the game loop. */
-
-static void set_key_down(int key, int b)
+static void set_key(int key, int s)
 {
     if (key < 65 || key > 90) return;
-    key_down[key - 65] = b;
-}
-
-static void set_key_pressed(int key)
-{
-    if (key < 65 || key > 90) return;
-    key_pressed[key - 65] = 1;
+    key_current[key - 65] = s;
 }
 
 int is_key_down(int key)
 {
-    return key_down[key - 65];
+    return key_current[key - 65];
 }
 
 int is_key_pressed(int key)
 {
-    int i = key - 65;
-    int b = key_down[i];
-    key_down[i] = 0;
-    return b;
+    return !key_previous[key - 65] && key_current[key - 65];
+}
+
+int is_key_released(int key)
+{
+    return key_previous[key - 65] && !key_current[key - 65];
 }
 
 double window_zoom(void)
@@ -64,7 +55,6 @@ void window_mouse_pos(double *x, double *y)
     *y = screen_my;
 }
 
-/* Static zoom callback */
 static void scroll_callback(GLFWwindow *window, double dx, double dy)
 {
     /* Zoom out */
@@ -84,28 +74,9 @@ static void scroll_callback(GLFWwindow *window, double dx, double dy)
 }
 
 /* Sets 'zoom_target' used in 'update_zoom' */
-void set_zoom_target(double zoom)
+void window_zoom_target(double zoom)
 {
     zoom_target = zoom;
-}
-
-/* Increments 'zoom' by 'zoom_delta' until 'zoom_target' is reached */
-void update_zoom(void)
-{
-    /* Zoom out */
-    if (zoom_target < zoom)
-    {
-        zoom -= (dt * zoom_delta);
-        if (zoom < zoom_target)
-            zoom = zoom_target;
-    }
-    /* Zoom in */
-    else if (zoom_target > zoom)
-    {
-        zoom += (dt * zoom_delta);
-        if (zoom > zoom_target)
-            zoom = zoom_target;
-    }
 }
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action,
@@ -113,12 +84,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action,
 {
     if (action == GLFW_PRESS)
     {
-        set_key_down(key, 1);
-        set_key_pressed(key);
+        set_key(key, 1);
     }
     if (action == GLFW_RELEASE)
     {
-        set_key_down(key, 0);
+        set_key(key, 0);
     }
 }
 
@@ -136,12 +106,8 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action,
         switch (button)
         {
         case GLFW_MOUSE_BUTTON_RIGHT:
-            mouse_down[MOUSE_RIGHT] = 1;
-            mouse_pressed[MOUSE_RIGHT] = 1;
-            break;
         case GLFW_MOUSE_BUTTON_LEFT:
-            mouse_down[MOUSE_LEFT] = 1;
-            mouse_pressed[MOUSE_LEFT] = 1;
+            mouse_current[button] = 1;
             break;
         }
     }
@@ -150,57 +116,58 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action,
         switch (button)
         {
         case GLFW_MOUSE_BUTTON_RIGHT:
-            mouse_down[MOUSE_RIGHT] = 0;
-            break;
         case GLFW_MOUSE_BUTTON_LEFT:
-            mouse_down[MOUSE_LEFT] = 0;
+            mouse_current[button] = 0;
             break;
         }
     }
 }
 
-/* Returns 1 once when 'key' is pressed, 0 otherwise */
 int is_mouse_pressed(int key)
 {
-    int value = 0;
-    switch (key)
-    {
-    case MOUSE_RIGHT:
-        value = mouse_pressed[MOUSE_RIGHT];
-        mouse_pressed[MOUSE_RIGHT] = 0;
-        return value;
-    case MOUSE_LEFT:
-        value = mouse_pressed[MOUSE_LEFT];
-        mouse_pressed[MOUSE_LEFT] = 0;
-        return value;
-    }
-
-    return -1;
+    return !mouse_previous[key] && mouse_current[key];
 }
 
-/* Returns 1 once when 'key' is released, 0 otherwise */
-static int is_mouse_released(int key)
+int is_mouse_released(int key)
 {
-    switch (key)
-    {
-        /* TODO: Implement this */
-    }
-
-    return -1;
+    return mouse_previous[key] && !mouse_current[key];
 }
 
-/* Returns 1 as long as 'key' is down, 0 otherwise */
 int is_mouse_down(int key)
 {
-    switch (key)
+    return mouse_current[key];
+}
+
+void window_update_keys(void)
+{
+    memcpy(mouse_previous, mouse_current, sizeof(int) * 2);
+    memcpy(key_previous, key_current, sizeof(int) * 26);
+}
+
+int window_update_zoom(void)
+{
+    /* Zoom out */
+    if (zoom_target < zoom)
     {
-    case MOUSE_RIGHT:
-        return mouse_down[MOUSE_RIGHT];
-    case MOUSE_LEFT:
-        return mouse_down[MOUSE_LEFT];
+        zoom -= (dt * zoom_delta);
+        if (zoom < zoom_target)
+        {
+            zoom = zoom_target;
+            return 0;
+        }
+    }
+    /* Zoom in */
+    else if (zoom_target > zoom)
+    {
+        zoom += (dt * zoom_delta);
+        if (zoom > zoom_target)
+        {
+            zoom = zoom_target;
+            return 0;
+        }
     }
 
-    return -1;
+    return 1;
 }
 
 void window_center(GLFWwindow *window)
@@ -243,9 +210,6 @@ Window * new_window(int width, int height)
 
     window_width = width;
     window_height = height;
-
-    memset(key_down, 0, 26 * sizeof(int));
-    memset(key_pressed, 0, 26 * sizeof(int));
 
     Window *window = (Window *)malloc(sizeof(Window));
     window->width = width;

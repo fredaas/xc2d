@@ -243,6 +243,8 @@ int main(int argc, char **argv)
         if (is_key_pressed(GLFW_KEY_Q))
             glfwSetWindowShouldClose(window->view, GLFW_TRUE);
 
+        window_update_keys();
+
         glfwSwapBuffers(window->view);
         glfwPollEvents();
     }
