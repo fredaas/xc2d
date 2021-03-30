@@ -4,6 +4,8 @@
 double zoom = 1.0;
 double zoom_max = 1.0 + 1.0;
 double zoom_min = 1.0 - 0.75;
+double zoom_delta = 1.0;
+double zoom_target = 1.0;
 
 /* Keys */
 int key_down[26];
@@ -20,6 +22,11 @@ int mouse_pressed[2] = { 0, 0 };
 
 double window_width = 0;
 double window_height = 0;
+
+/* TODO: I/O functions implementing "pressed" functionality are cleared after the
+   first call to the function. A key press should persist until the end of the
+   main loop, the same goes for functions implementing "down" functionality,
+   which may clear the key at arbitrary points in the game loop. */
 
 static void set_key_down(int key, int b)
 {
@@ -57,19 +64,47 @@ void window_mouse_pos(double *x, double *y)
     *y = screen_my;
 }
 
+/* Static zoom callback */
 static void scroll_callback(GLFWwindow *window, double dx, double dy)
 {
+    /* Zoom out */
     if (dy < 0)
     {
         zoom -= 0.1;
         if (zoom < zoom_min)
             zoom = zoom_min;
     }
+    /* Zoom in */
     else
     {
         zoom += 0.1;
-        if (zoom > zoom_max)
+         if (zoom > zoom_max)
             zoom = zoom_max;
+    }
+}
+
+/* Sets 'zoom_target' used in 'update_zoom' */
+void set_zoom_target(double zoom)
+{
+    zoom_target = zoom;
+}
+
+/* Increments 'zoom' by 'zoom_delta' until 'zoom_target' is reached */
+void update_zoom(void)
+{
+    /* Zoom out */
+    if (zoom_target < zoom)
+    {
+        zoom -= (dt * zoom_delta);
+        if (zoom < zoom_target)
+            zoom = zoom_target;
+    }
+    /* Zoom in */
+    else if (zoom_target > zoom)
+    {
+        zoom += (dt * zoom_delta);
+        if (zoom > zoom_target)
+            zoom = zoom_target;
     }
 }
 

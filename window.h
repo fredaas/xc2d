@@ -22,4 +22,7 @@ int is_mouse_down(int key);
 double window_zoom(void);
 void window_mouse_pos(double *x, double *y);
 
+void update_zoom(void);
+void set_zoom_target(double zoom);
+
 #endif /* WINDOW_H */
