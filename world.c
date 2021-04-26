@@ -53,7 +53,7 @@ World * new_world(char *path)
     world->cell_size = 30;
 
     /* Create rects from file */
-    Rect *blocks[256];
+    Cell *blocks[256];
     char c;
     int ny = 0, nx = 0;
     while ((c = fgetc(fp)) != EOF)
@@ -72,32 +72,56 @@ World * new_world(char *path)
             double x = nx;
             double y = world->n_cells_y - ny - 1;
             double size = world->cell_size;
-            blocks[world->n_blocks] = new_rect(x * size, y * size, size);
+            Rect *rect = new_rect(x * size, y * size, size);
+            Cell *block = (Cell *)malloc(sizeof(Cell));
+            block->type = BLOCK_RECT;
+            block->value = (void *)rect;
+            block->x = x * size;
+            block->y = y * size;
+            blocks[world->n_blocks] = block;
+            world->n_blocks++;
+            nx++;
+        }
+        else if (c == 'o')
+        {
+            double x = nx;
+            double y = world->n_cells_y - ny - 1;
+            double size = world->cell_size;
+            double cx = x * size + size / 2;
+            double cy = y * size + size / 2;
+            Circle *circle = new_circle(cx, cy, size / 2);
+            Cell *block = (Cell *)malloc(sizeof(Cell));
+            block->type = BLOCK_CIRCLE;
+            block->value = (void *)circle;
+            block->x = cx;
+            block->y = cy;
+            blocks[world->n_blocks] = block;
             world->n_blocks++;
             nx++;
         }
     }
 
     /* Initialize world blocks */
-    world->blocks = (Rect **)malloc(
-        world->n_blocks * sizeof(Rect *)
+    world->blocks = (Cell **)malloc(
+        world->n_blocks * sizeof(Cell *)
     );
-    memcpy(&(world->blocks[0]), blocks, world->n_blocks * sizeof(Rect *));
+    for (int i = 0; i < world->n_blocks; i++)
+        world->blocks[i] = blocks[i];
 
     /* Initialize world grid */
-    world->cells = (Rect **)malloc(
-        world->n_cells_x * world->n_cells_y * sizeof(Rect *)
+    world->grid = (Cell **)malloc(
+        world->n_cells_x * world->n_cells_y * sizeof(Cell *)
     );
     for (int i = 0; i < world->n_cells_x * world->n_cells_y; i++)
-        world->cells[i] = NULL;
+        world->grid[i] = NULL;
 
     /* Add blocks to world grid */
     for (int i = 0; i < world->n_blocks; i++)
     {
-        Rect *block = world->blocks[i];
+        Cell *block = world->blocks[i];
         int x, y;
-        world_pos2cell(world, block->cx, block->cy, &x, &y);
-        world->cells[y * world->n_cells_x + x] = block;
+        world_pos2cell(world, block->x, block->y, &x, &y);
+        world->grid[y * world->n_cells_x + x] = block;
     }
 
     return world;
@@ -136,8 +160,17 @@ void world_draw(World *self)
 {
     for (int i = 0; i < self->n_blocks; i++)
     {
-        Rect *block = self->blocks[i];
-        draw_square(block->cx, block->cy, block->size, 0xffffffff);
+        Cell *block = self->blocks[i];
+        if (block->type == BLOCK_RECT)
+        {
+            Rect *rect = (Rect *)block->value;
+            draw_square(rect->cx, rect->cy, rect->size, 0xffffffff);
+        }
+        else if (block->type == BLOCK_CIRCLE)
+        {
+            Circle *circle = (Circle *)block->value;
+            draw_circle(circle->cx, circle->cy, circle->size, 0xffffffff);
+        }
     }
 }
 
@@ -185,9 +218,9 @@ void world_update_scale(World *self)
     self->y -= (wy0 - wy1);
 }
 
-Rect *world_cell(World *self, int x, int y)
+Cell *world_cell(World *self, int x, int y)
 {
     if ((x < 0) || (x >= self->n_cells_x) || (y < 0) || (y >= self->n_cells_y))
         return NULL;
-    return self->cells[y * self->n_cells_x + x];
+    return self->grid[y * self->n_cells_x + x];
 }
