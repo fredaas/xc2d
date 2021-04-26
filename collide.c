@@ -64,6 +64,23 @@ void collide_cr(Circle *circle, Rect *rect)
     }
 }
 
+void collide_rc(Rect *rect, Circle *circle)
+{
+    double nx, ny;
+    rect_minpoint(rect, circle->cx, circle->cy, &nx, &ny);
+
+    double vec[2] = { nx - circle->cx, ny - circle->cy };
+    double overlap = circle->size - vec2_size(vec);
+
+    if (overlap > 0.0)
+    {
+        double uvec[2] = { 0.0, 0.0 };
+        vec2_norm(vec, uvec);
+        rect->cx += uvec[0] * overlap;
+        rect->cy += uvec[1] * overlap;
+    }
+}
+
 /* Resolves circle-circle collisions where 'c2' is a static structure */
 void collide_cc(Circle *c1, Circle *c2)
 {
