@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "circle.h"
 #include "rect.h"
+#include "vec2.h"
 
 void draw_color(int hex);
 void draw_square(double x, double y, double size, int hex);

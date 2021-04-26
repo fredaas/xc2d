@@ -42,12 +42,6 @@ void rect_move_backward(Rect *self)
     self->cy -= self->v * dt;
 }
 
-void rect_minpoint(Rect *self, double x, double y, double *nx, double *ny)
-{
-    *nx = max(self->cx, min(self->cx + self->size, x));
-    *ny = max(self->cy, min(self->cy + self->size, y));
-}
-
 void rect_draw(Rect *self)
 {
     glColor4f(1.0, 1.0, 1.0, 1.0);

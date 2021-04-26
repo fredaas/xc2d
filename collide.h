@@ -4,6 +4,7 @@
 #include "vec2.h"
 #include "circle.h"
 #include "rect.h"
+#include "vec2.h"
 
 void collide_rr(Rect *r1, Rect *r2);
 void collide_cr(Circle *circle, Rect *rect);

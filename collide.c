@@ -14,7 +14,7 @@ void collide_rr(Rect *r1, Rect *r2)
     double cy1 = y1 + s1 / 2;
 
     double nx, ny;
-    rect_minpoint(r2, cx1, cy1, &nx, &ny);
+    vec2_rxdelta(r2, cx1, cy1, &nx, &ny);
 
     double vec[2] = { nx - cx1, ny - cy1 };
 
@@ -50,7 +50,7 @@ void collide_rr(Rect *r1, Rect *r2)
 void collide_cr(Circle *circle, Rect *rect)
 {
     double nx, ny;
-    rect_minpoint(rect, circle->cx, circle->cy, &nx, &ny);
+    vec2_rxdelta(rect, circle->cx, circle->cy, &nx, &ny);
 
     double vec[2] = { nx - circle->cx, ny - circle->cy };
     double overlap = circle->size - vec2_size(vec);
@@ -67,7 +67,7 @@ void collide_cr(Circle *circle, Rect *rect)
 void collide_rc(Rect *rect, Circle *circle)
 {
     double nx, ny;
-    rect_minpoint(rect, circle->cx, circle->cy, &nx, &ny);
+    vec2_rxdelta(rect, circle->cx, circle->cy, &nx, &ny);
 
     double vec[2] = { nx - circle->cx, ny - circle->cy };
     double overlap = circle->size - vec2_size(vec);

@@ -51,7 +51,7 @@ void draw_circle(double x, double y, double size, int hex)
 void draw_circle_ray(Circle *circle, Rect *rect)
 {
     double nx, ny;
-    rect_minpoint(rect, circle->cx, circle->cy, &nx, &ny);
+    vec2_rxdelta(rect, circle->cx, circle->cy, &nx, &ny);
     glColor4f(1.0, 1.0, 1.0, 1.0);
     glBegin(GL_LINES);
     glVertex2f(nx, ny);
@@ -65,7 +65,7 @@ void draw_rect_ray(Rect *r1, Rect *r2)
     double x = r1->cx + size / 2;
     double y = r1->cy + size / 2;
     double nx, ny;
-    rect_minpoint(r2, x, y, &nx, &ny);
+    vec2_rxdelta(r2, x, y, &nx, &ny);
     glColor4f(1.0, 1.0, 1.0, 1.0);
     glBegin(GL_LINES);
     glVertex2f(nx, ny);
@@ -83,7 +83,7 @@ void draw_rect_normal(Rect *r1, Rect *r2)
     double cy1 = y1 + s1 / 2;
 
     double nx, ny;
-    rect_minpoint(r2, cx1, cy1, &nx, &ny);
+    vec2_rxdelta(r2, cx1, cy1, &nx, &ny);
 
     double vec[2] = { nx - cx1, ny - cy1 };
 

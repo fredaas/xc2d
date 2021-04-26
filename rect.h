@@ -21,6 +21,5 @@ void rect_move_left(Rect *self);
 void rect_move_right(Rect *self);
 void rect_move_forward(Rect *self);
 void rect_move_backward(Rect *self);
-void rect_minpoint(Rect *self, double x, double y, double *nx, double *ny);
 
 #endif /* RECT_H */
