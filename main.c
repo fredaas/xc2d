@@ -61,7 +61,6 @@ void resolve_rect(Cell *cell)
             Rect *rect = (Rect *)cell->value;
             collide_rr(p_rect, rect);
             draw_rect_ray(p_rect, rect);
-            draw_rect_normal(p_rect, rect);
             break;
         }
     case BLOCK_CIRCLE:
