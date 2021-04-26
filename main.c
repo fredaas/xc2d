@@ -11,6 +11,29 @@ World *world = NULL;
 Circle *p_circle = NULL;
 Rect *p_rect = NULL;
 
+void resolve_circle(Cell *cell)
+{
+    if (cell == NULL)
+        return;
+
+    switch (cell->type)
+    {
+    case BLOCK_RECT:
+        {
+            Rect *rect = (Rect *)cell->value;
+            collide_cr(p_circle, rect);
+            draw_circle_ray(p_circle, rect);
+            break;
+        }
+    case BLOCK_CIRCLE:
+        {
+            Circle *circle = (Circle *)cell->value;
+            collide_cc(p_circle, circle);
+            break;
+        }
+    }
+}
+
 void world_resolve_circle_collision(void)
 {
     int x, y;
@@ -21,19 +44,32 @@ void world_resolve_circle_collision(void)
         for (int dx = -1; dx <= 1; dx++)
         {
             Cell *cell = world_cell(world, x + dx, y + dy);
-            if (cell == NULL)
-                continue;
-            if (cell->type == BLOCK_RECT)
-            {
-                Rect *rect = (Rect *)cell->value;
-                collide_cr(p_circle, rect);
-                draw_circle_ray(p_circle, rect);
-            }
-            else if (cell->type == BLOCK_CIRCLE)
-            {
-                Circle *circle = (Circle *)cell->value;
-                collide_cc(p_circle, circle);
-            }
+            resolve_circle(cell);
+        }
+    }
+}
+
+void resolve_rect(Cell *cell)
+{
+    if (cell == NULL)
+        return;
+
+    switch (cell->type)
+    {
+    case BLOCK_RECT:
+        {
+            Rect *rect = (Rect *)cell->value;
+            collide_rr(p_rect, rect);
+            draw_rect_ray(p_rect, rect);
+            draw_rect_normal(p_rect, rect);
+            break;
+        }
+    case BLOCK_CIRCLE:
+        {
+            Circle *circle = (Circle *)cell->value;
+            collide_rc(p_rect, circle);
+            draw_circle_ray(circle, p_rect);
+            break;
         }
     }
 }
@@ -49,43 +85,19 @@ void world_resolve_rect_collision(void)
     for (int dy = -1; dy <= 1; dy++)
     {
         Cell *cell = world_cell(world, x, y + dy);
-        if (cell == NULL)
-            continue;
-        if (cell->type == BLOCK_RECT)
-        {
-            Rect *rect = (Rect *)cell->value;
-            collide_rr(p_rect, rect);
-            draw_rect_ray(p_rect, rect);
-            draw_rect_normal(p_rect, rect);
-        }
+        resolve_rect(cell);
     }
     /* Left */
     for (int dy = -1; dy <= 1; dy++)
     {
         Cell *cell = world_cell(world, x - 1, y + dy);
-        if (cell == NULL)
-            continue;
-        if (cell->type == BLOCK_RECT)
-        {
-            Rect *rect = (Rect *)cell->value;
-            draw_rect_ray(p_rect, rect);
-            draw_rect_normal(p_rect, rect);
-            collide_rr(p_rect, rect);
-        }
+        resolve_rect(cell);
     }
     /* Right */
     for (int dy = -1; dy <= 1; dy++)
     {
         Cell *cell = world_cell(world, x + 1, y + dy);
-        if (cell == NULL)
-            continue;
-        if (cell->type == BLOCK_RECT)
-        {
-            Rect *rect = (Rect *)cell->value;
-            draw_rect_ray(p_rect, rect);
-            draw_rect_normal(p_rect, rect);
-            collide_rr(p_rect, rect);
-        }
+        resolve_rect(cell);
     }
 }
 
