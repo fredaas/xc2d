@@ -19,8 +19,8 @@
 #define rotate_x(x, y, r) (x * cos(r) - y * sin(r))
 #define rotate_y(x, y, r) (x * sin(r) + y * cos(r))
 
-/* Extracts 'k' bits from 'n' starting at position 'p' */
-#define biso(n, k, p) (((1 << (k)) - 1) & (n) >> (p))
+/* Extract r bits from b starting at s: b[s, s + r) */
+#define bitrange(b, s, r) ((b >> s) & ((1 << r) - 1))
 
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define min(a, b) ((a) < (b) ? (a) : (b))

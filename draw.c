@@ -3,10 +3,10 @@
 void draw_color(int hex)
 {
     glColor4f(
-        biso(hex, 8, 24) / 256.0,
-        biso(hex, 8, 16) / 256.0,
-        biso(hex, 8, 8) / 256.0,
-        biso(hex, 8, 0) / 256.0
+        bitrange(hex, 24, 8) / 256.0,
+        bitrange(hex, 16, 8) / 256.0,
+        bitrange(hex, 8, 8) / 256.0,
+        bitrange(hex, 0, 8) / 256.0
     );
 }
 
